@@ -1,14 +1,58 @@
 package org.lessons.java;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class Evento {
 
-    private String nome;
+    private String titolo;
     private LocalDate data;
-    private int postiTotali = 0;
-    private int postiPrenotati;
+    private int postiTotali;
+    private int postiPrenotati = 0;
 
+    public Evento(String titolo, LocalDate data, int postiTotali) {
+
+        if (data.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("la data non puo essere gia passata ");
+        }
+        if (postiTotali < 0){
+            throw new IllegalArgumentException("il numero di posti totali deve essere positivo");
+        }
+
+        this.titolo = titolo;
+        this.data = data;
+        this.postiTotali = postiTotali;
+    }
+
+    @Override
+    public String toString() {
+        return "Evento " +
+                ", data=" + getFormattedData() + '\'' +
+                "titolo='" + titolo;
+    }
+
+    private int postiDisponibili() {
+        return postiTotali - postiPrenotati;
+    }
+    public void prenota(int numeroPosti) {
+        if (data.isBefore(LocalDate.now())) {
+            throw new IllegalStateException("L'evento è già passato");
+        }
+        if (postiPrenotati + numeroPosti > postiTotali) {
+            throw new IllegalStateException("Non ci sono abbastanza posti disponibili");
+        }
+        postiPrenotati += numeroPosti;
+    }
+
+    public void disdici(int numeroPosti) {
+        if (data.isBefore(LocalDate.now())) {
+            throw new IllegalStateException("L'evento è già passato");
+        }
+        if (postiPrenotati < numeroPosti) {
+            throw new IllegalStateException("Non ci sono abbastanza posti prenotati da disdire");
+        }
+        postiPrenotati -= numeroPosti;
+    }
     public int getPostiTotali() {
         return postiTotali;
     }
@@ -17,19 +61,23 @@ public class Evento {
         return postiPrenotati;
     }
 
-    public String getNome() {
-        return nome;
+    public String getTitolo() {
+        return titolo;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setTitolo(String titolo) {
+        this.titolo = titolo;
     }
 
-    public LocalDate getData() {
-        return data;
+    public String getFormattedData() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        return data.format(formatter);
     }
 
     public void setData(LocalDate data) {
+        if (data.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("La data dell'evento non può essere passata");
+        }
         this.data = data;
     }
 }
