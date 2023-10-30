@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
@@ -29,25 +30,76 @@ public class Main {
                 int scelta = scanner.nextInt();
                 scanner.nextLine();
 
+                boolean datiModificati = false;
+
                 switch (scelta) {
                     case 1:
-                        System.out.println("Inserisci il titolo del concerto:");
-                        String titolo = scanner.nextLine();
+                        String titolo = null;
+                        while (titolo == null || titolo.trim().isEmpty()) {
+                            System.out.println("Inserisci il titolo del concerto:");
+                            titolo = scanner.nextLine();
+                            if (titolo.trim().isEmpty()) {
+                                System.out.println("Il titolo non può essere vuoto. Riprova.");
+                            }
+                        }
 
-                        System.out.println("Inserisci la data del concerto (gg/mm/yyyy):");
-                        String dataString = scanner.nextLine();
-                        LocalDate data = LocalDate.parse(dataString, format);
 
-                        System.out.println("Inserisci l'orario del concerto (HH:mm):");
-                        String orarioString = scanner.nextLine();
-                        DateTimeFormatter orarioFormat = DateTimeFormatter.ofPattern("HH:mm");
-                        LocalTime orario = LocalTime.parse(orarioString, orarioFormat);
+                        LocalDate data = null;
+                        while (data == null) {
+                            try {
+                                System.out.println("Inserisci la data del concerto (gg/mm/yyyy):");
+                                String dataString = scanner.nextLine();
+                                data = LocalDate.parse(dataString, format);
+                                if (data.isBefore(LocalDate.now())) {
+                                    System.out.println("La data non può essere passata. Inserisci una data futura.");
+                                    data = null;
+                                }
+                            } catch (DateTimeParseException e) {
+                                System.out.println("Formato data non valido. Inserisci la data nel formato gg/mm/yyyy.");
+                            }
+                        }
 
-                        System.out.println("Inserisci il numero di posti totali:");
-                        int postiTotali = scanner.nextInt();
+                        LocalTime orario = null;
+                        while (orario == null) {
+                            try {
+                                System.out.println("Inserisci l'orario del concerto (HH:mm):");
+                                String orarioString = scanner.nextLine();
+                                DateTimeFormatter orarioFormat = DateTimeFormatter.ofPattern("HH:mm");
+                                orario = LocalTime.parse(orarioString, orarioFormat);
+                            } catch (DateTimeParseException e) {
+                                System.out.println("Formato orario non valido. Inserisci l'orario nel formato HH:mm.");
+                            }
+                        }
 
-                        System.out.println("Inserisci il prezzo del concerto:");
-                        BigDecimal prezzo = scanner.nextBigDecimal();
+                        int postiTotali = 0;
+                        while (postiTotali <= 0) {
+                            try {
+                                System.out.println("Inserisci il numero di posti totali:");
+                                postiTotali = scanner.nextInt();
+                                if (postiTotali <= 0) {
+                                    System.out.println("Il numero di posti totali deve essere positivo. Riprova.");
+                                }
+                            } catch (InputMismatchException e) {
+                                    System.out.println("Devi inserire un numero. Riprova.");
+                                    scanner.next();
+                            }
+                        }
+
+                        BigDecimal prezzo = BigDecimal.valueOf(0);
+                        while (prezzo.compareTo(BigDecimal.ZERO) <= 0) {
+                            try {
+                                System.out.println("Inserisci il prezzo del concerto:");
+                                prezzo = scanner.nextBigDecimal();
+                                if (prezzo.compareTo(BigDecimal.ZERO) <= 0) {
+                                    System.out.println("Il prezzo deve essere positivo. Riprova.");
+                                }
+                            } catch (InputMismatchException e) {
+                                System.out.println("Devi inserire un numero valido. Riprova.");
+                                scanner.next();  // Pulisce l'input errato
+                            }
+                        }
+
+
 
                         evento = new Concerto(titolo, data, postiTotali, orario, prezzo);
                         programmaEventi.aggiungiEvento(evento);
@@ -61,6 +113,7 @@ public class Main {
 
                             evento.prenota(postiDaPrenotare);
                             System.out.println("Posti prenotati con successo!");
+                            datiModificati = true;
                         } else {
                             System.out.println("Nessun evento disponibile per la prenotazione.");
                         }
@@ -73,6 +126,7 @@ public class Main {
 
                             evento.disdici(postiDaDisdire);
                             System.out.println("Posti disdetti con successo!");
+                            datiModificati = true;
                         } else {
                             System.out.println("Nessun evento disponibile per disdire i posti.");
                         }
@@ -117,15 +171,13 @@ public class Main {
                         break;
                 }
 
-                if (evento != null) {
-                    System.out.println("dati evento dopo operazioni:");
+                if (evento != null && datiModificati) {
+                    System.out.println("dati evento dopo operazioni: Evento " + evento.getTitolo());
                     System.out.println("Posti prenotati: " + evento.getPostiPrenotati());
                     System.out.println("Posti disponibili: " + evento.postiDisponibili());
                 }
             }
-        }catch (InputMismatchException e) {
-            System.out.println("Devi inserire un numero. Riprova.");
-            scanner.next();
+
         }
         catch (Exception e) {
             System.out.println("Si è verificato un errore: " + e.getMessage());

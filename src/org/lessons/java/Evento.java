@@ -3,6 +3,7 @@ package org.lessons.java;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,15 +16,15 @@ public class Evento {
 
     public Evento(String titolo, LocalDate data, int postiTotali) throws IllegalArgumentException{
 
-        if (titolo.isEmpty()){
-            throw new IllegalArgumentException("il titolo non puo essere una stringa vuota ");
-        }
-        if (data.isBefore(LocalDate.now())) {
-            throw new IllegalArgumentException("la data non puo essere gia passata ");
-        }
-        if (postiTotali < 0){
-            throw new IllegalArgumentException("il numero di posti totali deve essere positivo");
-        }
+//        if (titolo.isEmpty()){
+//            throw new IllegalArgumentException("il titolo non puo essere una stringa vuota. Riprova");
+//        }
+//        if (data.isBefore(LocalDate.now())) {
+//            throw new IllegalArgumentException("la data non puo essere gia passata ");
+//        }
+//        if (postiTotali <= 0){
+//            throw new IllegalArgumentException("il numero di posti totali deve essere positivo");
+//        }
 
         this.titolo = titolo;
         this.data = data;
@@ -41,12 +42,12 @@ public class Evento {
         return postiTotali - postiPrenotati;
     }
     public void prenota(int numeroPosti) {
-//        if (data.isBefore(LocalDate.now())) {
-//            throw new IllegalStateException("L'evento è già passato");
-//        }
-//        if (postiPrenotati <= 0) {
-//            throw new IllegalArgumentException("Devi prenotare almeno un posto");
-//        }
+        if (data.isBefore(LocalDate.now())) {
+            throw new IllegalStateException("L'evento è già passato");
+        }
+        if (numeroPosti  <= 0) {
+            throw new IllegalArgumentException("Devi prenotare almeno un posto");
+        }
         if (postiPrenotati + numeroPosti > postiTotali) {
             throw new IllegalStateException("Non ci sono abbastanza posti disponibili");
         }
@@ -84,6 +85,7 @@ public class Evento {
     public String getFormattedData() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         return data.format(formatter);
+
     }
     public void setData(LocalDate data) {
         if (data.isBefore(LocalDate.now())) {
