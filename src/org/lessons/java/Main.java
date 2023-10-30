@@ -58,7 +58,7 @@ public class Main {
                         if (!programmaEventi.getEventi().isEmpty()) {
                             System.out.println("Quanti posti vuoi prenotare?");
                             int postiDaPrenotare = scanner.nextInt();
-                            // Aggiungere logica per selezionare un evento specifico se necessario
+
                             evento.prenota(postiDaPrenotare);
                             System.out.println("Posti prenotati con successo!");
                         } else {
@@ -70,7 +70,7 @@ public class Main {
                         if (!programmaEventi.getEventi().isEmpty()) {
                             System.out.println("Quanti posti vuoi disdire?");
                             int postiDaDisdire = scanner.nextInt();
-                            // Aggiungere logica per selezionare un evento specifico se necessario
+
                             evento.disdici(postiDaDisdire);
                             System.out.println("Posti disdetti con successo!");
                         } else {
@@ -92,10 +92,19 @@ public class Main {
 
                     case 5:
                         System.out.println("Inserisci la data dei concerti da visualizzare (gg/mm/yyyy):");
+//                        scanner.nextLine();
                         String dataEventoString = scanner.nextLine();
+
                         LocalDate dataEvento = LocalDate.parse(dataEventoString, format);
-                        System.out.println("Concerti in data " + dataEventoString + ":");
-                        programmaEventi.getEventiInData(dataEvento);
+                        List<Evento> eventiInData = programmaEventi.getEventiInData(dataEvento);
+                        if (eventiInData.isEmpty()) {
+                            System.out.println("Non ci sono eventi in data " + dataEventoString);
+                        } else {
+                            System.out.println("Concerti in data " + dataEventoString + ":");
+                            for (Evento e : eventiInData) {
+                                System.out.println(e);
+                            }
+                        }
                         break;
 
                     case 6:

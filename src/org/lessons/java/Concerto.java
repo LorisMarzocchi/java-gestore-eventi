@@ -42,7 +42,7 @@ public class Concerto extends Evento{
 
     @Override
     public String toString() {
-        return "Concerto: " + "in data" +
-                getFormattedData() + " " + "ora:" + getFormattedOra() + " - " + getTitolo() + " - " + "prezzo" + getFormattedPrezzo();
+        return "Concerto: " + "in data " +
+                getFormattedData() + " " + "ora:" + getFormattedOra() + " - " + getTitolo() + " - " + "prezzo " + getFormattedPrezzo();
     }
 }
